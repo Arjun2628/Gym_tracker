@@ -137,10 +137,71 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
             ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // Hero Workout Image Banner
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        'assets/images/workout_hero.jpg',
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                      ),
+                      Container(
+                        height: 150,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withAlpha((0.85 * 255).round()),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 12,
+                        left: 14,
+                        right: 14,
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: GymColors.neonGreen,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'PRO SPLITS',
+                                style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w900),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Text(
+                                'Hypertrophy & Strength Protocols',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+
                 // Section Science Context Card
                 const SectionContextCard(
                   item: SectionScienceContext.workoutSplitContext,
-                  initialExpanded: true,
+                  initialExpanded: false,
                 ),
 
                 // Split Selector Carousel / Chips

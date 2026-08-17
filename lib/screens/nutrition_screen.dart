@@ -538,6 +538,83 @@ class NutritionScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Gourmet Nutrition Hero Banner
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              children: [
+                Image.asset(
+                  'assets/images/nutrition_banner.jpg',
+                  height: 140,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                ),
+                Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withAlpha((0.85 * 255).round()),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 12,
+                  left: 14,
+                  right: 14,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: GymColors.neonGreen,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'MACRO FUEL',
+                              style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Optimized Athletic Nutrition',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: GymColors.neonCyan,
+                          side: const BorderSide(color: GymColors.neonCyan),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          minimumSize: Size.zero,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                        icon: const Icon(Icons.tune, size: 14),
+                        label: const Text('CUSTOM', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                        onPressed: () => _showCustomMacroDialog(context, gym),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
           // 1. ACTIVE DIET PROTOCOL CARD (User Selected)
           Container(
             padding: const EdgeInsets.all(16),
