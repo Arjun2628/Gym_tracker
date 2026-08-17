@@ -93,54 +93,56 @@ class _MemberHomeShellState extends State<MemberHomeShell> {
                   ],
                 ),
 
-                // Quick Switch Member Profile / Account
-                PopupMenuButton<String>(
-                  tooltip: 'Switch Athlete Profile',
-                  icon: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: GymColors.cardBg,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: GymColors.cardBorder),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.person_pin, color: GymColors.neonCyan, size: 14),
-                        SizedBox(width: 4),
-                        Text('SWITCH', style: TextStyle(color: GymColors.neonCyan, fontSize: 10, fontWeight: FontWeight.bold)),
-                      ],
+                // Personal Membership Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: (activeMember?.status == 'Active'
+                            ? GymColors.neonGreen
+                            : (activeMember?.status == 'Overdue'
+                                ? GymColors.neonRed
+                                : GymColors.neonAmber))
+                        .withAlpha((0.15 * 255).round()),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: (activeMember?.status == 'Active'
+                              ? GymColors.neonGreen
+                              : (activeMember?.status == 'Overdue'
+                                  ? GymColors.neonRed
+                                  : GymColors.neonAmber))
+                          .withAlpha((0.4 * 255).round()),
                     ),
                   ),
-                  color: GymColors.cardBg,
-                  itemBuilder: (ctx) {
-                    return gym.members.map((m) {
-                      final isSelected = m.id == activeMember?.id;
-                      return PopupMenuItem<String>(
-                        value: m.id,
-                        child: Row(
-                          children: [
-                            Icon(
-                              isSelected ? Icons.check_circle : Icons.person_outline,
-                              color: isSelected ? GymColors.neonGreen : GymColors.textMuted,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              m.name,
-                              style: TextStyle(
-                                color: isSelected ? Colors.white : GymColors.textSecondary,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: activeMember?.status == 'Active'
+                              ? GymColors.neonGreen
+                              : (activeMember?.status == 'Overdue'
+                                  ? GymColors.neonRed
+                                  : GymColors.neonAmber),
                         ),
-                      );
-                    }).toList();
-                  },
-                  onSelected: (memberId) {
-                    gym.setActiveMember(memberId);
-                  },
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        (activeMember?.status ?? 'ACTIVE').toUpperCase(),
+                        style: TextStyle(
+                          color: activeMember?.status == 'Active'
+                              ? GymColors.neonGreen
+                              : (activeMember?.status == 'Overdue'
+                                  ? GymColors.neonRed
+                                  : GymColors.neonAmber),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

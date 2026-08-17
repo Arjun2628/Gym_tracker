@@ -93,60 +93,56 @@ class _HomeShellState extends State<HomeShell> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    // Member Selector Popup
-                    PopupMenuButton<String>(
-                      tooltip: 'Switch Active Member',
-                      icon: const Icon(Icons.people_outline, color: GymColors.textSecondary, size: 20),
-                      color: GymColors.cardBg,
-                      itemBuilder: (ctx) {
-                        return gym.members.map((m) {
-                          return PopupMenuItem<String>(
-                            value: m.id,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  m.id == activeMember?.id ? Icons.check_circle : Icons.person_outline,
-                                  color: m.id == activeMember?.id ? GymColors.neonGreen : GymColors.textMuted,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  m.name,
-                                  style: TextStyle(
-                                    color: m.id == activeMember?.id ? Colors.white : GymColors.textSecondary,
-                                    fontWeight: m.id == activeMember?.id ? FontWeight.bold : FontWeight.normal,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList();
-                      },
-                      onSelected: (memberId) {
-                        gym.setActiveMember(memberId);
-                      },
+                // Personal Membership Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: (activeMember?.status == 'Active'
+                            ? GymColors.neonGreen
+                            : (activeMember?.status == 'Overdue'
+                                ? GymColors.neonRed
+                                : GymColors.neonAmber))
+                        .withAlpha((0.15 * 255).round()),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: (activeMember?.status == 'Active'
+                              ? GymColors.neonGreen
+                              : (activeMember?.status == 'Overdue'
+                                  ? GymColors.neonRed
+                                  : GymColors.neonAmber))
+                          .withAlpha((0.4 * 255).round()),
                     ),
-                    const SizedBox(width: 4),
-
-                    // Admin Switch Button
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: GymColors.neonGreen,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        minimumSize: Size.zero,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: activeMember?.status == 'Active'
+                              ? GymColors.neonGreen
+                              : (activeMember?.status == 'Overdue'
+                                  ? GymColors.neonRed
+                                  : GymColors.neonAmber),
+                        ),
                       ),
-                      icon: const Icon(Icons.admin_panel_settings, size: 14),
-                      label: const Text('ADMIN WEB', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
-                      onPressed: () {
-                        gym.setRole(AppRole.admin);
-                      },
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Text(
+                        (activeMember?.status ?? 'ACTIVE').toUpperCase(),
+                        style: TextStyle(
+                          color: activeMember?.status == 'Active'
+                              ? GymColors.neonGreen
+                              : (activeMember?.status == 'Overdue'
+                                  ? GymColors.neonRed
+                                  : GymColors.neonAmber),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
