@@ -1,0 +1,256 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/gym_provider.dart';
+import '../theme/gym_theme.dart';
+import 'dashboard_screen.dart';
+import 'profile_biomarkers_screen.dart';
+import 'nutrition_screen.dart';
+import 'growth_rate_screen.dart';
+import 'workouts_screen.dart';
+import 'active_workout_screen.dart';
+import 'user_fees_screen.dart';
+import 'admin/admin_shell.dart';
+
+class HomeShell extends StatefulWidget {
+  const HomeShell({super.key});
+
+  @override
+  State<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends State<HomeShell> {
+  int _currentIndex = 0;
+
+  void _navigateToTab(int index) {
+    setState(() => _currentIndex = index);
+  }
+
+  void _openActiveWorkout() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ActiveWorkoutScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gym = context.watch<GymProvider>();
+
+    // 1. If in Admin Mode, render the Web/Desktop Admin Shell
+    if (gym.isAdmin) {
+      return const AdminShell();
+    }
+
+    // 2. If in Member Mode, render the Member App with quick role switcher & fees
+    final screens = [
+      DashboardScreen(
+        onNavigateTab: _navigateToTab,
+        onOpenActiveWorkout: _openActiveWorkout,
+      ),
+      const ProfileBiomarkersScreen(),
+      const NutritionScreen(),
+      const GrowthRateScreen(),
+      WorkoutsScreen(onOpenActiveWorkout: _openActiveWorkout),
+      const UserFeesScreen(),
+    ];
+
+    final activeMember = gym.activeMember;
+
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(48),
+        child: Container(
+          color: GymColors.surface,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: SafeArea(
+            bottom: false,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 14,
+                      backgroundColor: GymColors.neonGreen.withAlpha((0.2 * 255).round()),
+                      child: Text(
+                        activeMember != null && activeMember.name.isNotEmpty ? activeMember.name.substring(0, 1) : 'U',
+                        style: const TextStyle(color: GymColors.neonGreen, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          activeMember?.name ?? 'Gym Athlete',
+                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${activeMember?.planType ?? 'Member'} • Fee: \$${activeMember?.monthlyFee.toStringAsFixed(0) ?? '50'}',
+                          style: const TextStyle(color: GymColors.textMuted, fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    // Member Selector Popup
+                    PopupMenuButton<String>(
+                      tooltip: 'Switch Active Member',
+                      icon: const Icon(Icons.people_outline, color: GymColors.textSecondary, size: 20),
+                      color: GymColors.cardBg,
+                      itemBuilder: (ctx) {
+                        return gym.members.map((m) {
+                          return PopupMenuItem<String>(
+                            value: m.id,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  m.id == activeMember?.id ? Icons.check_circle : Icons.person_outline,
+                                  color: m.id == activeMember?.id ? GymColors.neonGreen : GymColors.textMuted,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  m.name,
+                                  style: TextStyle(
+                                    color: m.id == activeMember?.id ? Colors.white : GymColors.textSecondary,
+                                    fontWeight: m.id == activeMember?.id ? FontWeight.bold : FontWeight.normal,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList();
+                      },
+                      onSelected: (memberId) {
+                        gym.setActiveMember(memberId);
+                      },
+                    ),
+                    const SizedBox(width: 4),
+
+                    // Admin Switch Button
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: GymColors.neonGreen,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        minimumSize: Size.zero,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                      icon: const Icon(Icons.admin_panel_settings, size: 14),
+                      label: const Text('ADMIN WEB', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
+                      onPressed: () {
+                        gym.setRole(AppRole.admin);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: screens[_currentIndex],
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Persistent Active Workout Mini-Bar if Running
+          if (gym.isWorkoutActive)
+            InkWell(
+              onTap: _openActiveWorkout,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: GymColors.neonGreen.withAlpha((0.15 * 255).round()),
+                  border: const Border(
+                    top: BorderSide(color: GymColors.neonGreen, width: 1.5),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: GymColors.neonGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ACTIVE WORKOUT: ${gym.activeSessionDayName}',
+                            style: const TextStyle(color: GymColors.neonGreen, fontSize: 12, fontWeight: FontWeight.w900),
+                          ),
+                          Text(
+                            '${gym.activeWorkoutTotalSetsCompleted} sets completed • Vol: ${gym.activeWorkoutTotalVolume.toStringAsFixed(0)}kg',
+                            style: const TextStyle(color: GymColors.textSecondary, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: GymColors.neonGreen,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        minimumSize: Size.zero,
+                      ),
+                      onPressed: _openActiveWorkout,
+                      child: const Text('RESUME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // Main Navigation Bar
+          NavigationBar(
+            selectedIndex: _currentIndex,
+            backgroundColor: GymColors.surface,
+            indicatorColor: GymColors.neonGreen.withAlpha((0.2 * 255).round()),
+            onDestinationSelected: _navigateToTab,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.dashboard_outlined, color: GymColors.textMuted),
+                selectedIcon: Icon(Icons.dashboard, color: GymColors.neonGreen),
+                label: 'Overview',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.tune_outlined, color: GymColors.textMuted),
+                selectedIcon: Icon(Icons.tune, color: GymColors.neonCyan),
+                label: 'Biomarkers',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.restaurant_outlined, color: GymColors.textMuted),
+                selectedIcon: Icon(Icons.restaurant, color: GymColors.neonGreen),
+                label: 'Nutrition',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.trending_up_outlined, color: GymColors.textMuted),
+                selectedIcon: Icon(Icons.trending_up, color: GymColors.neonAmber),
+                label: 'Growth',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.fitness_center_outlined, color: GymColors.textMuted),
+                selectedIcon: Icon(Icons.fitness_center, color: GymColors.neonRed),
+                label: 'Splits',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.receipt_long_outlined, color: GymColors.textMuted),
+                selectedIcon: Icon(Icons.receipt_long, color: GymColors.neonCyan),
+                label: 'My Fees',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
