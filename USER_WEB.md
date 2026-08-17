@@ -76,40 +76,46 @@ lib/
 │   │       ├── models/                      # DietPlanModel, FoodItemModel, DailyNutritionLogModel
 │   │       ├── datasources/                 # NutritionLocalDataSource (Hive)
 │   │       └── repositories/                # NutritionRepositoryImpl
-│   │
-│   └── profile_growth/
-│       ├── domain/
-│       │   ├── entities/                    # UserProfileEntity, BodyMeasurementEntity
-│       │   ├── repositories/                # ProfileRepository (Contract)
-│       │   └── usecases/                    # GetUserProfileUseCase, UpdateUserProfileUseCase, LogMeasurementUseCase
-│       └── data/
-│           ├── datasources/                 # ProfileLocalDataSource (Hive)
-│           └── repositories/                # ProfileRepositoryImpl
+├── core/                                        # Shared Clean Architecture Core
+├── features/                                    # Domain Entities, Repositories & Use Cases
+├── models/                                      # Data Models & Adapters
 │
 ├── screens/
-│   ├── member_home_shell.dart               # Desktop/Laptop Member Shell
+│   ├── member_home_shell.dart               # Responsive 2-Screen Sliding Member Shell
 │   ├── dashboard_screen.dart                # Daily Overview & Quick Metrics
 │   ├── nutrition_screen.dart                # Diet Protocol & Custom Macro Hub
 │   ├── growth_rate_screen.dart              # Interactive Progression Charts
-│   ├── workouts_screen.dart                 # Splits Directory
+│   ├── workouts_screen.dart                 # Splits Directory & Live Session
 │   └── user_fees_screen.dart                # Personal Membership & Fee Ledger
 │
-└── main.dart                                # Multi-site URL router (/user or /)
+└── main_user.dart                               # Standalone User Web & Mobile Entry Point
 ```
 
 ---
 
 ## 5. Development & Deployment Commands
 
-### Run Locally on Web
+### Run Standalone User Web in Chrome (Single Athlete System)
 ```bash
-# Run User Web portal via router
-flutter run -d chrome --web-port=8080
+# Run User Web portal directly on Chrome
+flutter run -t lib/main_user.dart -d chrome
+```
+
+### Run on a Dedicated Port
+```bash
+# Run User Web on http://localhost:8080
+flutter run -t lib/main_user.dart -d chrome --web-port=8090
+```
+
+### Run Admin Web (Separate System)
+```bash
+# Run Admin Web on http://localhost:8081
+flutter run -t lib/main_admin.dart -d chrome --web-port=8091
 ```
 
 ### Build for Production Web Hosting
 ```bash
-# Build optimized user web release
-flutter build web --release --output=build/web_user
+# Build standalone User Web production release
+flutter build web -t lib/main_user.dart --release --output=build/web_user
 ```
-*(When hosted, accessible at root URL `/` or `/user`)*
+*(Deploy to your web hosting bucket or CDN as the standalone Member Portal)*
