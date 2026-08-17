@@ -185,9 +185,12 @@ class GrowthRateScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1050),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
           // Section Science Context Card
           const SectionContextCard(
             item: SectionScienceContext.growthRateContext,
@@ -460,8 +463,10 @@ class GrowthRateScreen extends StatelessWidget {
           const SizedBox(height: 24),
         ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   Widget _buildCircumferencePill(String label, double? val, String unit) {
     return Column(

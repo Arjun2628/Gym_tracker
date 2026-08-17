@@ -104,9 +104,12 @@ class _ProfileBiomarkersScreenState extends State<ProfileBiomarkersScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1050),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
           // Section Science & Context Card
           const SectionContextCard(
             item: SectionScienceContext.biomarkersContext,
@@ -386,8 +389,10 @@ class _ProfileBiomarkersScreenState extends State<ProfileBiomarkersScreen> {
           const SizedBox(height: 24),
         ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   Widget _buildMetricCard({
     required String title,

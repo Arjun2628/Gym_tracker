@@ -535,9 +535,12 @@ class NutritionScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1050),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
           // Gourmet Nutrition Hero Banner
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
@@ -1003,8 +1006,10 @@ class NutritionScreen extends StatelessWidget {
           const SizedBox(height: 24),
         ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   static Widget _buildMacroChip(String label, String value, Color color) {
     return Expanded(

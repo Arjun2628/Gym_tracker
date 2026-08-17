@@ -61,13 +61,16 @@ class UserFeesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Membership Summary Card
-            Container(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Membership Summary Card
+                Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: GymColors.cardBg,
@@ -271,11 +274,13 @@ class UserFeesScreen extends StatelessWidget {
                   );
                 },
               ),
-          ],
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildMiniInfo(String label, String value) {
     return Column(

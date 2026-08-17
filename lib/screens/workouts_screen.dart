@@ -131,12 +131,15 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            // TAB 1: TRAINING SPLITS
-            ListView(
-              padding: const EdgeInsets.all(16),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1050),
+            child: TabBarView(
               children: [
+                // TAB 1: TRAINING SPLITS
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
                 // Hero Workout Image Banner
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
@@ -512,6 +515,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 }

@@ -363,10 +363,13 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Sticky Live Rest Timer Header if Running
-          if (gym.isRestTimerRunning)
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Column(
+            children: [
+              // Sticky Live Rest Timer Header if Running
+              if (gym.isRestTimerRunning)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               color: GymColors.neonCyan.withAlpha((0.2 * 255).round()),
@@ -620,8 +623,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 
   Widget _buildMiniLiveStat(String label, String value, Color color) {
     return Column(
