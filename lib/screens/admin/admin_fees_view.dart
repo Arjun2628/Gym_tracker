@@ -155,7 +155,7 @@ class _AdminFeesViewState extends State<AdminFeesView> {
                       border: Border.all(color: GymColors.cardBorder),
                     ),
                     child: DropdownButton<String>(
-                      value: _selectedMonthFilter,
+                      value: allMonths.contains(_selectedMonthFilter) ? _selectedMonthFilter : 'All',
                       dropdownColor: GymColors.surface,
                       underline: const SizedBox(),
                       style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -597,6 +597,7 @@ class _AdminFeesViewState extends State<AdminFeesView> {
                     const SizedBox(height: 8),
 
                     DropdownButtonFormField<String>(
+                      isExpanded: true,
                       initialValue: paymentMethod,
                       dropdownColor: GymColors.surface,
                       style: const TextStyle(color: Colors.white),
@@ -609,7 +610,7 @@ class _AdminFeesViewState extends State<AdminFeesView> {
                         ),
                       ),
                       items: ['UPI / GPay', 'Cash', 'Credit/Debit Card', 'Bank Transfer'].map((m) {
-                        return DropdownMenuItem(value: m, child: Text(m));
+                        return DropdownMenuItem(value: m, child: Text(m, overflow: TextOverflow.ellipsis));
                       }).toList(),
                       onChanged: (v) => setModalState(() => paymentMethod = v ?? 'Cash'),
                     ),

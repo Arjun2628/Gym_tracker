@@ -42,6 +42,7 @@ class GymProvider extends ChangeNotifier {
   int _restTimerSecondsRemaining = 0;
   int _restTimerTotalSeconds = 90;
   bool _isRestTimerRunning = false;
+  bool _isSyncingWithCloud = false;
   Timer? _restTimer;
 
   GymProvider() {
@@ -52,6 +53,7 @@ class GymProvider extends ChangeNotifier {
   AppRole get currentRole => _currentRole;
   bool get isAdmin => _currentRole == AppRole.admin;
   bool get isUser => _currentRole == AppRole.user;
+  bool get isSyncingWithCloud => _isSyncingWithCloud;
 
   List<MemberModel> get members => _members;
   List<FeeRecord> get feeRecords => _feeRecords;
@@ -195,6 +197,9 @@ class GymProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+
+    // Auto-sync all local members & fees to Cloud Firestore in the background
+    unawaited(syncAllToCloud());
   }
 
   // --- ADMIN: MEMBER MANAGEMENT ---
@@ -218,8 +223,8 @@ class GymProvider extends ChangeNotifier {
     notifyListeners();
     await HiveGymService.saveMembers(_members);
     await HiveGymService.saveFeeRecords(_feeRecords);
-    FirebaseGymService.syncMember(member);
-    FirebaseGymService.syncFeeRecord(fee);
+    await FirebaseGymService.syncMember(member);
+    await FirebaseGymService.syncFeeRecord(fee);
   }
 
   Future<void> updateMember(MemberModel member) async {
@@ -231,7 +236,7 @@ class GymProvider extends ChangeNotifier {
       }
       notifyListeners();
       await HiveGymService.saveMembers(_members);
-      FirebaseGymService.syncMember(member);
+      await FirebaseGymService.syncMember(member);
     }
   }
 
@@ -244,7 +249,19 @@ class GymProvider extends ChangeNotifier {
     notifyListeners();
     await HiveGymService.saveMembers(_members);
     await HiveGymService.saveFeeRecords(_feeRecords);
-    FirebaseGymService.deleteMember(id);
+    await FirebaseGymService.deleteMember(id);
+  }
+
+  Future<Map<String, int>> syncAllToCloud() async {
+    _isSyncingWithCloud = true;
+    notifyListeners();
+    try {
+      final result = await FirebaseGymService.syncAllMembersAndFees(_members, _feeRecords);
+      return result;
+    } finally {
+      _isSyncingWithCloud = false;
+      notifyListeners();
+    }
   }
 
   // --- ADMIN: FEES & MONTHLY PENDING MANAGEMENT ---
@@ -268,15 +285,15 @@ class GymProvider extends ChangeNotifier {
       _feeRecords[index] = updated;
 
       // Update member status if needed
-      _updateMemberFeeStatus(existing.memberId);
+      await _updateMemberFeeStatus(existing.memberId);
 
       notifyListeners();
       await HiveGymService.saveFeeRecords(_feeRecords);
-      FirebaseGymService.syncFeeRecord(updated);
+      await FirebaseGymService.syncFeeRecord(updated);
     }
   }
 
-  void _updateMemberFeeStatus(String memberId) {
+  Future<void> _updateMemberFeeStatus(String memberId) async {
     final memberIndex = _members.indexWhere((m) => m.id == memberId);
     if (memberIndex != -1) {
       final memberDues = _feeRecords.where((f) => f.memberId == memberId && f.status != 'Paid').toList();
@@ -285,7 +302,8 @@ class GymProvider extends ChangeNotifier {
           ? 'Overdue'
           : (memberDues.isNotEmpty ? 'Pending Fee' : 'Active');
       _members[memberIndex] = _members[memberIndex].copyWith(status: newStatus);
-      HiveGymService.saveMembers(_members);
+      await HiveGymService.saveMembers(_members);
+      await FirebaseGymService.syncMember(_members[memberIndex]);
     }
   }
 
@@ -381,6 +399,7 @@ class GymProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_profile', _profile.toJson());
+    FirebaseGymService.syncUserProfile(_profile);
   }
 
   // --- NUTRITION METHODS ---
@@ -423,6 +442,7 @@ class GymProvider extends ChangeNotifier {
       'nutrition_${_todayNutrition.dateKey}',
       json.encode(_todayNutrition.toMap()),
     );
+    FirebaseGymService.syncDailyNutrition(_todayNutrition);
   }
 
   // --- MEASUREMENT & GROWTH METHODS ---
@@ -435,6 +455,7 @@ class GymProvider extends ChangeNotifier {
       if (idx != -1) {
         _members[idx] = _members[idx].copyWith(currentWeight: measurement.weightKg);
         await HiveGymService.saveMembers(_members);
+        FirebaseGymService.syncMember(_members[idx]);
       }
     }
     notifyListeners();
@@ -443,6 +464,8 @@ class GymProvider extends ChangeNotifier {
     final list = _measurements.map((m) => m.toMap()).toList();
     await prefs.setString('measurements_list', json.encode(list));
     await prefs.setString('user_profile', _profile.toJson());
+    FirebaseGymService.syncBodyMeasurement(measurement);
+    FirebaseGymService.syncUserProfile(_profile);
   }
 
   Future<void> deleteMeasurement(String id) async {
@@ -451,6 +474,7 @@ class GymProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final list = _measurements.map((m) => m.toMap()).toList();
     await prefs.setString('measurements_list', json.encode(list));
+    FirebaseGymService.deleteBodyMeasurement(id);
   }
 
   // --- WORKOUT SPLIT METHODS ---
@@ -643,6 +667,9 @@ class GymProvider extends ChangeNotifier {
     _activeSessionStartTime = null;
     stopRestTimer();
 
+    // Sync workout session to Cloud Firestore
+    FirebaseGymService.syncWorkoutSession(session);
+
     // Increment member workouts completed
     if (_activeMember != null) {
       final idx = _members.indexWhere((m) => m.id == _activeMember!.id);
@@ -652,6 +679,7 @@ class GymProvider extends ChangeNotifier {
           attendanceStreak: _members[idx].attendanceStreak + 1,
         );
         HiveGymService.saveMembers(_members);
+        FirebaseGymService.syncMember(_members[idx]);
       }
     }
 

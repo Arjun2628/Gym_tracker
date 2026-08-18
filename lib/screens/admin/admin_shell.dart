@@ -106,21 +106,53 @@ class _AdminShellState extends State<AdminShell> {
                 ),
               ),
               const SizedBox(width: 14),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: GymColors.cardBg,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.cloud_done, color: GymColors.neonCyan, size: 14),
-                    SizedBox(width: 4),
-                    Text(
-                      'Hive Local & Firestore Sync',
-                      style: TextStyle(color: GymColors.neonCyan, fontSize: 11),
-                    ),
-                  ],
+              InkWell(
+                onTap: gym.isSyncingWithCloud
+                    ? null
+                    : () async {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Syncing all local data to Firebase Cloud Firestore...'),
+                            backgroundColor: GymColors.surface,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        final res = await gym.syncAllToCloud();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Synced ${res['members']} members and ${res['fees']} fee records to Firestore!'),
+                              backgroundColor: GymColors.neonGreen,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: GymColors.cardBg,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: GymColors.cardBorder),
+                  ),
+                  child: Row(
+                    children: [
+                      if (gym.isSyncingWithCloud)
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: GymColors.neonCyan),
+                        )
+                      else
+                        const Icon(Icons.cloud_upload_outlined, color: GymColors.neonCyan, size: 15),
+                      const SizedBox(width: 6),
+                      Text(
+                        gym.isSyncingWithCloud ? 'Syncing...' : 'SYNC ALL TO CLOUD',
+                        style: const TextStyle(color: GymColors.neonCyan, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

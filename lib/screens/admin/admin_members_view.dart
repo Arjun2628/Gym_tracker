@@ -267,7 +267,9 @@ class _AdminMembersViewState extends State<AdminMembersView> {
                   style: const TextStyle(color: GymColors.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -280,7 +282,6 @@ class _AdminMembersViewState extends State<AdminMembersView> {
                         style: const TextStyle(color: GymColors.neonCyan, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
@@ -292,7 +293,6 @@ class _AdminMembersViewState extends State<AdminMembersView> {
                         style: const TextStyle(color: GymColors.textMuted, fontSize: 11),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(

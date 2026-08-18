@@ -29,7 +29,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
   String _gender = 'Male';
   String _planType = 'Monthly';
   String? _assignedDietId = 'diet_hypertrophy_mass';
-  String? _assignedSplitId = 'split_ppl';
+  String? _assignedSplitId = 'ppl_split';
 
   @override
   void initState() {
@@ -48,8 +48,8 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
     if (m != null) {
       _gender = m.gender;
       _planType = m.planType;
-      _assignedDietId = m.assignedDietId ?? 'diet_hypertrophy_mass';
-      _assignedSplitId = m.assignedSplitId ?? 'split_ppl';
+      _assignedDietId = m.assignedDietId;
+      _assignedSplitId = m.assignedSplitId;
     }
   }
 
@@ -134,38 +134,44 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: GymColors.neonGreen.withAlpha((0.15 * 255).round()),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          isEditing ? Icons.edit_note : Icons.person_add_alt_1,
-                          color: GymColors.neonGreen,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isEditing ? 'Edit Member Profile' : 'Onboard New Member',
-                            style: const TextStyle(
-                              color: GymColors.textPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: GymColors.neonGreen.withAlpha((0.15 * 255).round()),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          const Text(
-                            'Assign plan, monthly fees, diet and workout protocols',
-                            style: TextStyle(color: GymColors.textSecondary, fontSize: 12),
+                          child: Icon(
+                            isEditing ? Icons.edit_note : Icons.person_add_alt_1,
+                            color: GymColors.neonGreen,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isEditing ? 'Edit Member Profile' : 'Onboard New Member',
+                                style: const TextStyle(
+                                  color: GymColors.textPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const Text(
+                                'Assign plan, monthly fees, diet and workout protocols',
+                                style: TextStyle(color: GymColors.textSecondary, fontSize: 12),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, color: GymColors.textMuted),
@@ -224,12 +230,13 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _gender,
+                              isExpanded: true,
+                              initialValue: ['Male', 'Female', 'Other'].contains(_gender) ? _gender : 'Male',
                               dropdownColor: GymColors.surface,
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration('Gender', Icons.wc_outlined),
                               items: ['Male', 'Female', 'Other'].map((g) {
-                                return DropdownMenuItem(value: g, child: Text(g));
+                                return DropdownMenuItem(value: g, child: Text(g, overflow: TextOverflow.ellipsis));
                               }).toList(),
                               onChanged: (v) => setState(() => _gender = v ?? 'Male'),
                             ),
@@ -266,12 +273,13 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _planType,
+                              isExpanded: true,
+                              initialValue: ['Monthly', 'Quarterly', 'Half-Yearly', 'Annual'].contains(_planType) ? _planType : 'Monthly',
                               dropdownColor: GymColors.surface,
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration('Membership Tier', Icons.card_membership),
                               items: ['Monthly', 'Quarterly', 'Half-Yearly', 'Annual'].map((p) {
-                                return DropdownMenuItem(value: p, child: Text(p));
+                                return DropdownMenuItem(value: p, child: Text(p, overflow: TextOverflow.ellipsis));
                               }).toList(),
                               onChanged: (v) {
                                 if (v != null) {
@@ -323,7 +331,10 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _assignedSplitId,
+                              isExpanded: true,
+                              initialValue: gym.splits.any((s) => s.id == _assignedSplitId)
+                                  ? _assignedSplitId
+                                  : (gym.splits.isNotEmpty ? gym.splits.first.id : null),
                               dropdownColor: GymColors.surface,
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration('Assigned Split', Icons.fitness_center),
@@ -336,7 +347,10 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _assignedDietId,
+                              isExpanded: true,
+                              initialValue: gym.allDietPlans.any((d) => d.id == _assignedDietId)
+                                  ? _assignedDietId
+                                  : (gym.allDietPlans.isNotEmpty ? gym.allDietPlans.first.id : null),
                               dropdownColor: GymColors.surface,
                               style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration('Assigned Diet', Icons.restaurant_menu),
