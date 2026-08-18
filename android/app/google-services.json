@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "486013101298",
+    "firebase_url": "https://testproject-d7784-default-rtdb.firebaseio.com",
+    "project_id": "testproject-d7784",
+    "storage_bucket": "testproject-d7784.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486013101298:android:66ec421802afb9a030dc6b",
+        "android_client_info": {
+          "package_name": "com.apexgym.app.gym_tracker_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbAWxO8PJTjn8aBUbMnY5uKgSia7CdCxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486013101298:android:4d6dd946bf19bf2430dc6b",
+        "android_client_info": {
+          "package_name": "com.example.email"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbAWxO8PJTjn8aBUbMnY5uKgSia7CdCxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486013101298:android:e3eea7243d85d05230dc6b",
+        "android_client_info": {
+          "package_name": "com.example.firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbAWxO8PJTjn8aBUbMnY5uKgSia7CdCxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
